@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu de Suites Numériques</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #FFE5F0 0%, #FFB6D9 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 800px;
+            height: 600px;
+            background: #FFE5F0;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #FF69B4;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .game-header {
+            background: #FF69B4;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-header span {
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title {
+            color: #FF1493;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #FF69B4;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .btn {
+            font-family: 'Comic Sans MS', cursive;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 15px 30px;
+            margin: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            color: white;
+            width: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary { background: #FF1493; }
+        .btn-secondary { background: #FF69B4; }
+        .btn-info { background: #FF85C1; }
+        .btn-danger { background: #FFB6C1; }
+        .btn-success { background: #32CD32; }
+        .btn-warning { background: #FF6347; }
+        .btn-game { background: #4169E1; }
+
+        .btn-small {
+            font-size: 14px;
+            padding: 12px 24px;
+            width: 180px;
+            margin: 8px 5px;
+        }
+
+        .btn-option {
+            font-size: 11px;
+            padding: 10px 15px;
+            width: 160px;
+            margin: 4px;
+        }
+
+        input[type="text"], input[type="number"] {
+            font-family: 'Comic Sans MS', cursive;
+            font-size: 18px;
+            padding: 10px;
+            width: 250px;
+            text-align: center;
+            border: 3px solid #FF1493;
+            border-radius: 8px;
+            margin: 10px;
+        }
+
+        .sequence-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .sequence-box {
+            font-size: 24px;
+            font-weight: bold;
+            width: 70px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 4px solid #2E8B57;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+
+        .sequence-number {
+            background: #32CD32;
+            color: white;
+        }
+
+        .sequence-input {
+            font-family: 'Comic Sans MS', cursive;
+            font-size: 24px;
+            font-weight: bold;
+            width: 70px;
+            height: 50px;
+            text-align: center;
+            border: 4px solid #FF1493;
+            border-radius: 8px;
+            background: white;
+            color: #FF1493;
+        }
+
+        .sequence-input.correct {
+            background: #90EE90;
+            border-color: #32CD32;
+        }
+
+        .sequence-input.incorrect {
+            background: #FFB6C1;
+            border-color: #FF1493;
+        }
+
+        .explanation-box {
+            background: #E6F3FF;
+            border: 3px solid #4169E1;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            width: 100%;
+            max-width: 700px;
+            min-height: 100px;
+        }
+
+        .explanation-text {
+            font-size: 12px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .player-list {
+            max-height: 350px;
+            overflow-y: auto;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .player-btn {
+            width: 100%;
+            margin: 8px 0;
+            padding: 15px;
+            font-size: 12px;
+        }
+
+        .scores-table {
+            background: white;
+            border: 3px solid #FF69B4;
+            border-radius: 10px;
+            margin: 10px 0;
+            width: 100%;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .scores-header {
+            background: #FF69B4;
+            display: flex;
+            padding: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            position: sticky;
+            top: 0;
+        }
+
+        .scores-row {
+            display: flex;
+            padding: 8px 10px;
+            border-bottom: 1px solid #FFE5F0;
+            font-size: 10px;
+        }
+
+        .scores-row:nth-child(2) { background: #FFD700; }
+        .scores-row:nth-child(3) { background: #C0C0C0; }
+        .scores-row:nth-child(4) { background: #CD7F32; }
+        .scores-row:nth-child(n+5) { background: #FFE5F0; }
+
+        .col-pos { width: 80px; }
+        .col-name { width: 200px; font-weight: bold; }
+        .col-score { width: 120px; }
+        .col-games { width: 100px; }
+
+        .button-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .welcome-message {
+            font-size: 28px;
+            font-weight: bold;
+            color: #32CD32;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app"></div>
+
+    <script>
+        class JeuSuitesNumeriques {
+            constructor() {
+                this.joueurs = this.chargerJoueurs();
+                this.joueurActuel = null;
+                this.scorePartie = 0;
+                this.suiteComplete = [];
+                this.operation = '';
+                this.ecart = 0;
+                this.arythmique = false;
+                this.niveau = '1';
+                this.operationsChoisies = ['+', '-', 'x'];
+                
+                this.afficherMenuPrincipal();
+            }
+
+            chargerJoueurs() {
+                const data = localStorage.getItem('joueursScores');
+                return data ? JSON.parse(data) : {};
+            }
+
+            sauvegarderJoueurs() {
+                localStorage.setItem('joueursScores', JSON.stringify(this.joueurs));
+            }
+
+            render(html) {
+                document.getElementById('app').innerHTML = html;
+            }
+
+            afficherMenuPrincipal() {
+                this.render(`
+                    <div class="header">
+                        <h1>🌟 SUITES NUMÉRIQUES 🌟</h1>
+                    </div>
+                    <div class="content">
+                        <button class="btn btn-primary" onclick="app.nouveauJoueur()">🎮 Nouveau Joueur</button>
+                        <button class="btn btn-secondary" onclick="app.choisirJoueur()">👤 Choisir un Joueur</button>
+                        <button class="btn btn-info" onclick="app.afficherScores()">🏆 Voir les Scores</button>
+                        <button class="btn btn-danger" onclick="window.close()">❌ Quitter</button>
+                    </div>
+                `);
+            }
+
+            nouveauJoueur() {
+                this.render(`
+                    <div class="header">
+                        <h1>🌟 SUITES NUMÉRIQUES 🌟</h1>
+                    </div>
+                    <div class="content">
+                        <div class="title">✨ Nouveau Joueur ✨</div>
+                        <div class="subtitle">Ton prénom :</div>
+                        <input type="text" id="nomJoueur" placeholder="Entre ton prénom">
+                        <div class="error-message" id="errorMsg"></div>
+                        <div>
+                            <button class="btn btn-success btn-small" onclick="app.validerNouveauJoueur()">✓ Valider</button>
+                            <button class="btn btn-warning btn-small" onclick="app.afficherMenuPrincipal()">← Retour</button>
+                        </div>
+                    </div>
+                `);
+                document.getElementById('nomJoueur').focus();
+            }
+
+            validerNouveauJoueur() {
+                const nom = document.getElementById('nomJoueur').value.trim();
+                const errorMsg = document.getElementById('errorMsg');
+                
+                if (!nom) {
+                    errorMsg.textContent = '⚠️ Entre ton prénom !';
+                    return;
+                }
+                
+                if (this.joueurs[nom]) {
+                    errorMsg.textContent = '⚠️ ' + nom + ' existe déjà !';
+                    return;
+                }
+                
+                this.joueurs[nom] = { parties: 0, score_total: 0, meilleur_score: 0 };
+                this.sauvegarderJoueurs();
+                this.joueurActuel = nom;
+                
+                this.render(`
+                    <div class="content">
+                        <div class="welcome-message">✨ Bienvenue ` + nom + ` ! ✨</div>
+                    </div>
+                `);
+                
+                setTimeout(() => this.choisirOptions(), 1500);
+            }
+
+            choisirJoueur() {
+                if (Object.keys(this.joueurs).length === 0) {
+                    this.afficherMessage('Info', 'Aucun joueur enregistré !');
+                    return;
+                }
+
+                let playersHtml = '';
+                for (const nom in this.joueurs) {
+                    const stats = this.joueurs[nom];
+                    playersHtml += `
+                        <button class="btn btn-secondary player-btn" onclick="app.selectionnerJoueur('` + nom + `')">
+                            ` + nom + `<br>` + stats.parties + ` parties - ` + stats.score_total + ` pts
+                        </button>
+                    `;
+                }
+
+                this.render(`
+                    <div class="header">
+                        <h1>🌟 SUITES NUMÉRIQUES 🌟</h1>
+                    </div>
+                    <div class="content">
+                        <div class="title">👤 Choisis ton Profil 👤</div>
+                        <div class="player-list">
+                            ` + playersHtml + `
+                        </div>
+                        <button class="btn btn-warning btn-small" onclick="app.afficherMenuPrincipal()">← Retour</button>
+                    </div>
+                `);
+            }
+
+            selectionnerJoueur(nom) {
+                this.joueurActuel = nom;
+                
+                this.render(`
+                    <div class="content">
+                        <div class="welcome-message">👋 Bon retour ` + nom + ` ! 👋</div>
+                    </div>
+                `);
+                
+                setTimeout(() => this.choisirOptions(), 1500);
+            }
+
+            afficherScores() {
+                if (Object.keys(this.joueurs).length === 0) {
+                    this.afficherMessage('Info', 'Aucun score enregistré !');
+                    return;
+                }
+
+                const scores = Object.entries(this.joueurs)
+                    .sort((a, b) => b[1].score_total - a[1].score_total);
+
+                const medailles = ['🥇', '🥈', '🥉'];
+                let rowsHtml = '';
+                
+                scores.forEach((entry, index) => {
+                    const nom = entry[0];
+                    const stats = entry[1];
+                    const medaille = medailles[index] || '';
+                    rowsHtml += `
+                        <div class="scores-row">
+                            <div class="col-pos">` + medaille + ` ` + (index + 1) + `</div>
+                            <div class="col-name">` + nom + `</div>
+                            <div class="col-score">` + stats.score_total + `</div>
+                            <div class="col-games">` + stats.parties + `</div>
+                        </div>
+                    `;
+                });
+
+                this.render(`
+                    <div class="header">
+                        <h1>🌟 SUITES NUMÉRIQUES 🌟</h1>
+                    </div>
+                    <div class="content">
+                        <div class="title">🏆 CLASSEMENT 🏆</div>
+                        <div class="scores-table">
+                            <div class="scores-header">
+                                <div class="col-pos">Pos.</div>
+                                <div class="col-name">Joueur</div>
+                                <div class="col-score">Score</div>
+                                <div class="col-games">Parties</div>
+                            </div>
+                            ` + rowsHtml + `
+                        </div>
+                        <button class="btn btn-warning btn-small" onclick="app.afficherMenuPrincipal()">← Retour</button>
+                    </div>
+                `);
+            }
+
+            afficherMessage(titre, message) {
+                this.render(`
+                    <div class="header">
+                        <h1>🌟 SUITES NUMÉRIQUES 🌟</h1>
+                    </div>
+                    <div class="content">
+                        <div class="title">` + titre + `</div>
+                        <div class="subtitle" style="font-size: 16px; margin: 20px 0;">` + message + `</div>
+                        <button class="btn btn-secondary btn-small" onclick="app.afficherMenuPrincipal()">OK</button>
+                    </div>
+                `);
+            }
+
+            choisirOptions() {
+                this.render(`
+                    <div class="header">
+                        <h1>🌟 SUITES NUMÉRIQUES 🌟</h1>
+                    </div>
+                    <div class="content">
+                        <div class="title">Salut ` + this.joueurActuel + ` ! 🌈</div>
+                        
+                        <div class="subtitle">🔢 Choisis les opérations :</div>
+                        <div class="button-grid">
+                            <button class="btn btn-success btn-option" onclick="app.setOperations(['+'])">➕ Additions</button>
+                            <button class="btn btn-warning btn-option" onclick="app.setOperations(['-'])">➖ Soustractions</button>
+                            <button class="btn btn-game btn-option" onclick="app.setOperations(['x'])">✖️ Multiplications</button>
+                            <button class="btn btn-secondary btn-option" onclick="app.setOperations(['+', '-', 'x'])">🎲 Mélange</button>
+                        </div>
+                        
+                        <div class="subtitle" style="margin-top: 15px;">⭐ Choisis la difficulté :</div>
+                        <button class="btn btn-option" style="background: #90EE90;" onclick="app.setNiveau('1')">😊 Facile</button>
+                        <button class="btn btn-option" style="background: #FFD700;" onclick="app.setNiveau('2')">😎 Moyen</button>
+                        <button class="btn btn-option" style="background: #FF8C00;" onclick="app.setNiveau('3')">🔥 Difficile</button>
+                        <button class="btn btn-option" style="background: #DC143C;" onclick="app.setNiveau('4')">💪 Très Difficile</button>
+                        
+                        <button class="btn btn-warning btn-small" style="margin-top: 15px;" onclick="app.afficherMenuPrincipal()">← Retour</button>
+                    </div>
+                `);
+            }
+
+            setOperations(ops) {
+                this.operationsChoisies = ops;
+            }
+
+            setNiveau(niveau) {
+                this.niveau = niveau;
+                this.scorePartie = 0;
+                this.genererNouvelleSuite();
+            }
+
+            genererSuite() {
+                const operation = this.operationsChoisies[Math.floor(Math.random() * this.operationsChoisies.length)];
+                let debut, ecart, limiteMax;
+
+                if (this.niveau === '1') {
+                    limiteMax = 50;
+                    if (operation === '+') {
+                        debut = Math.floor(Math.random() * 30) + 1;
+                        ecart = Math.floor(Math.random() * 5) + 1;
+                    } else if (operation === '-') {
+                        debut = Math.floor(Math.random() * 31) + 20;
+                        ecart = Math.floor(Math.random() * 5) + 1;
+                    } else {
+                        debut = Math.floor(Math.random() * 5) + 1;
+                        ecart = Math.floor(Math.random() * 2) + 2;
+                    }
+                } else if (this.niveau === '2') {
+                    limiteMax = 100;
+                    if (operation === '+') {
+                        debut = Math.floor(Math.random() * 60) + 1;
+                        ecart = Math.floor(Math.random() * 10) + 1;
+                    } else if (operation === '-') {
+                        debut = Math.floor(Math.random() * 61) + 40;
+                        ecart = Math.floor(Math.random() * 10) + 1;
+                    } else {
+                        debut = Math.floor(Math.random() * 10) + 1;
+                        ecart = Math.floor(Math.random() * 3) + 2;
+                    }
+                } else if (this.niveau === '3') {
+                    limiteMax = 500;
+                    if (operation === '+') {
+                        debut = Math.floor(Math.random() * 300) + 1;
+                        ecart = Math.floor(Math.random() * 16) + 5;
+                    } else if (operation === '-') {
+                        debut = Math.floor(Math.random() * 301) + 200;
+                        ecart = Math.floor(Math.random() * 16) + 5;
+                    } else {
+                        debut = Math.floor(Math.random() * 20) + 1;
+                        ecart = Math.floor(Math.random() * 4) + 2;
+                    }
+                } else {
+                    limiteMax = 500;
+                    const ecart1 = Math.floor(Math.random() * 15) + 1;
+                    const ecart2 = Math.floor(Math.random() * 15) + 1;
+                    
+                    if (operation === '+') {
+                        debut = Math.floor(Math.random() * 300) + 1;
+                    } else if (operation === '-') {
+                        debut = Math.floor(Math.random() * 301) + 200;
+                    } else {
+                        debut = Math.floor(Math.random() * 15) + 1;
+                    }
+
+                    const suite = [debut];
+                    const ecarts = [ecart1, ecart2];
+                    
+                    for (let i = 0; i < 6; i++) {
+                        const ecartActuel = ecarts[i % 2];
+                        let prochain;
+                        
+                        if (operation === '+') prochain = suite[suite.length - 1] + ecartActuel;
+                        else if (operation === '-') prochain = suite[suite.length - 1] - ecartActuel;
+                        else prochain = suite[suite.length - 1] * ecartActuel;
+                        
+                        if (prochain < 0 || prochain > limiteMax) {
+                            return this.genererSuite();
+                        }
+                        suite.push(prochain);
+                    }
+                    
+                    return { suite: suite, operation: operation, ecart: [ecart1, ecart2], arythmique: true };
+                }
+
+                const suite = [debut];
+                for (let i = 0; i < 6; i++) {
+                    let prochain;
+                    
+                    if (operation === '+') prochain = suite[suite.length - 1] + ecart;
+                    else if (operation === '-') prochain = suite[suite.length - 1] - ecart;
+                    else prochain = suite[suite.length - 1] * ecart;
+                    
+                    if (prochain < 0 || prochain > limiteMax) {
+                        return this.genererSuite();
+                    }
+                    suite.push(prochain);
+                }
+
+                return { suite: suite, operation: operation, ecart: ecart, arythmique: false };
+            }
+
+            genererNouvelleSuite() {
+                const result = this.genererSuite();
+                this.suiteComplete = result.suite;
+                this.operation = result.operation;
+                this.ecart = result.ecart;
+                this.arythmique = result.arythmique;
+                this.afficherJeu();
+            }
+
+            afficherJeu() {
+                let numbersHtml = '';
+                for (let i = 0; i < 3; i++) {
+                    numbersHtml += '<div class="sequence-box sequence-number">' + this.suiteComplete[i] + '</div>';
+                }
+
+                let inputsHtml = '';
+                for (let i = 0; i < 4; i++) {
+                    inputsHtml += '<input type="number" class="sequence-input" id="input' + i + '">';
+                }
+
+                this.render(`
+                    <div class="game-header">
+                        <span>Joueur: ` + this.joueurActuel + `</span>
+                        <span id="scoreDisplay">⭐ Score: ` + this.scorePartie + `</span>
+                    </div>
+                    <div class="content">
+                        <div class="title" style="font-size: 20px; margin-bottom: 15px;">🎯 Complète la suite 🎯</div>
+                        
+                        <div class="sequence-container">
+                            ` + numbersHtml + `
+                            ` + inputsHtml + `
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <div class="explanation-text" id="explanation"></div>
+                        </div>
+                        
+                        <div>
+                            <button class="btn btn-success btn-small" onclick="app.verifierReponses()">✓ Vérifier</button>
+                            <button class="btn btn-game btn-small" onclick="app.genererNouvelleSuite()">🔄 Nouvelle</button>
+                            <button class="btn btn-warning btn-small" onclick="app.terminerPartie()">🏁 Terminer</button>
+                        </div>
+                    </div>
+                `);
+
+                document.getElementById('input0').focus();
+            }
+
+            verifierReponses() {
+                const reponses = [];
+                const inputs = [];
+                for (let i = 0; i < 4; i++) {
+                    inputs.push(document.getElementById('input' + i));
+                }
+                
+                for (let i = 0; i < inputs.length; i++) {
+                    const val = parseInt(inputs[i].value);
+                    if (isNaN(val)) {
+                        document.getElementById('explanation').innerHTML = 
+                            '<span style="color: red;">⚠️ Remplis tous les champs avec des nombres !</span>';
+                        return;
+                    }
+                    reponses.push(val);
+                }
+
+                let bonnesReponses = 0;
+                let message = '<strong>RÉSULTATS :</strong><br>';
+
+                for (let i = 0; i < reponses.length; i++) {
+                    const reponse = reponses[i];
+                    const correct = this.suiteComplete[3 + i];
+                    if (reponse === correct) {
+                        message += '✓ Nombre ' + (i + 1) + ' : CORRECT !   ';
+                        inputs[i].classList.add('correct');
+                        bonnesReponses++;
+                    } else {
+                        message += '✗ Nombre ' + (i + 1) + ' : FAUX (c\'était ' + correct + ')   ';
+                        inputs[i].classList.add('incorrect');
+                    }
+                }
+
+                this.scorePartie += bonnesReponses;
+
+                message += '<br><br><strong>EXPLICATION :</strong> ';
+                if (this.arythmique) {
+                    message += 'Suite arythmique alternant ' + this.operation + ' ' + this.ecart[0] + ' et ' + this.operation + ' ' + this.ecart[1];
+                } else {
+                    message += 'Chaque nombre ' + this.operation + ' ' + this.ecart;
+                }
+
+                message += '<br><br><strong>Suite complète :</strong> ' + this.suiteComplete.join(' - ');
+                message += '<br><br><strong>Score de la partie :</strong> ' + this.scorePartie + ' points';
+
+                if (bonnesReponses === 4) {
+                    message = '<strong style="color: #008000;">🎉 PARFAIT ! 🎉</strong><br><br>' + message;
+                }
+
+                document.getElementById('explanation').innerHTML = message;
+                document.getElementById('scoreDisplay').textContent = '⭐ Score: ' + this.scorePartie;
+            }
+
+            terminerPartie() {
+                if (this.scorePartie > 0) {
+                    this.joueurs[this.joueurActuel].parties += 1;
+                    this.joueurs[this.joueurActuel].score_total += this.scorePartie;
+                    if (this.scorePartie > this.joueurs[this.joueurActuel].meilleur_score) {
+                        this.joueurs[this.joueurActuel].meilleur_score = this.scorePartie;
+                    }
+                    this.sauvegarderJoueurs();
+
+                    const message = 'Partie terminée !<br><br>Score final : ' + this.scorePartie + ' points<br><br>Score total de ' + this.joueurActuel + ' : ' + this.joueurs[this.joueurActuel].score_total + ' points';
+                    
+                    this.render(`
+                        <div class="content">
+                            <div class="title">Bravo !</div>
+                            <div class="subtitle" style="font-size: 14px; margin: 20px; line-height: 1.8;">` + message + `</div>
+                            <button class="btn btn-secondary btn-small" onclick="app.afficherMenuPrincipal()">OK</button>
+                        </div>
+                    `);
+                } else {
+                    this.afficherMenuPrincipal();
+                }
+            }
+        }
+
+        const app = new JeuSuitesNumeriques();
+    </script>
+</body>
+</html>
